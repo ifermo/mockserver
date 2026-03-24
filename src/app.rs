@@ -9,12 +9,12 @@ use std::time::Instant;
 
 use anyhow::{Context, Result};
 use axum::{
+    Router,
     body::Body,
     extract::State,
-    http::{header::CONTENT_TYPE, Request},
+    http::{Request, header::CONTENT_TYPE},
     response::Response,
     routing::any,
-    Router,
 };
 use tokio::signal;
 use tokio::sync::RwLock;
@@ -22,7 +22,7 @@ use tower::ServiceBuilder;
 use tower_http::trace::TraceLayer;
 
 use crate::config::ServerConfig;
-use mockserver::spec::{match_request, update_spec_store, SharedSpecStore};
+use mockserver::spec::{SharedSpecStore, match_request, update_spec_store};
 
 /// 应用状态，包含规格存储和服务器配置
 #[derive(Clone)]

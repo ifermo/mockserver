@@ -18,9 +18,9 @@ pub mod matcher;
 pub mod models;
 pub mod store;
 
-pub use compiler::{compile_specs, SpecWithPattern};
+pub use compiler::{SpecWithPattern, compile_specs};
 pub use models::{Delay, HttpRequest, HttpResponse, Spec};
-pub use store::{load_specs_from_file, update_spec_store, SharedSpecStore};
+pub use store::{SharedSpecStore, load_specs_from_file, update_spec_store};
 
 /// 匹配请求并返回响应
 ///

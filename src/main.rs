@@ -9,7 +9,7 @@ mod config;
 use std::path::Path;
 
 use anyhow::{Context, Result};
-use tracing_subscriber::{fmt, EnvFilter};
+use tracing_subscriber::{EnvFilter, fmt};
 
 use crate::app::{create_app, handle_sighup, initialize_spec_store, shutdown_signal};
 

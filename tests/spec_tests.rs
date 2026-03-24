@@ -1,11 +1,11 @@
 use anyhow::Result;
 use axum::{
+    Router,
     body::Body,
     extract::State,
-    http::{header::CONTENT_TYPE, Request},
+    http::{Request, header::CONTENT_TYPE},
     response::Response,
     routing::any,
-    Router,
 };
 use mockserver::spec::{self, HttpRequest, HttpResponse, SharedSpecStore, Spec};
 use std::collections::HashMap;
