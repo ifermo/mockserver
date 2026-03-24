@@ -1,0 +1,9 @@
+services:
+  mock-server:
+    image: mockserver:0.1.0
+    restart: "no"
+    volumes:
+      - ./test-config.toml:/app/config.toml:ro
+      - ./test-spec.json:/app/test-spec.json:ro
+    ports:
+      - 3000:3000

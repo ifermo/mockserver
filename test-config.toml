@@ -1,0 +1,11 @@
+# MockServer 配置文件
+# 所有配置项都有默认值，可以不填
+
+# 服务器监听地址
+server_addr = "0.0.0.0:3000"
+
+# 请求体大小限制（字节）
+body_limit = 65536
+
+# Spec 配置文件路径
+spec_path = "spec.json"
