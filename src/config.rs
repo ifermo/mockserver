@@ -54,6 +54,10 @@ fn default_spec_path() -> String {
 
 /// 从配置文件加载服务器配置
 ///
+/// 环境变量优先级:
+/// - `MOCK_CONFIG`: 指定配置文件路径（优先级最高）
+/// - `MOCK_SPEC`: 指定规格文件路径（覆盖 config 中的 spec_path）
+///
 /// 如果配置文件不存在或解析失败，返回默认配置并记录警告日志
 ///
 /// # 参数
@@ -64,26 +68,50 @@ fn default_spec_path() -> String {
 ///
 /// 成功返回配置，失败返回默认配置
 pub fn load_config(config_path: &Path) -> Result<ServerConfig> {
-    match std::fs::read_to_string(config_path) {
+    let config_path_display = if let Ok(config_env) = std::env::var("MOCK_CONFIG") {
+        tracing::info!("Using config path from MOCK_CONFIG env: {}", config_env);
+        config_env.clone()
+    } else {
+        config_path.to_string_lossy().to_string()
+    };
+
+    let actual_config_path = Path::new(&config_path_display);
+
+    match std::fs::read_to_string(actual_config_path) {
         Ok(content) => {
-            let config: ServerConfig = toml::from_str(&content).with_context(|| {
-                format!("Failed to parse config file: {}", config_path.display())
+            let mut config: ServerConfig = toml::from_str(&content).with_context(|| {
+                format!(
+                    "Failed to parse config file: {}",
+                    actual_config_path.display()
+                )
             })?;
+
+            if let Ok(spec_path) = std::env::var("MOCK_SPEC") {
+                tracing::info!("Overriding spec_path from MOCK_SPEC env: {}", spec_path);
+                config.spec_path = spec_path;
+            }
+
             tracing::info!(
-                "Loaded config from {}: server_addr={}, body_limit={}",
-                config_path.display(),
+                "Loaded config from {}: server_addr={}, body_limit={}, spec_path={}",
+                actual_config_path.display(),
                 config.server_addr,
-                config.body_limit
+                config.body_limit,
+                config.spec_path
             );
             Ok(config)
         }
         Err(e) => {
             tracing::warn!(
                 "Failed to read config file {}: {}, using default config",
-                config_path.display(),
+                actual_config_path.display(),
                 e
             );
-            Ok(ServerConfig::default())
+            let mut config = ServerConfig::default();
+            if let Ok(spec_path) = std::env::var("MOCK_SPEC") {
+                tracing::info!("Overriding spec_path from MOCK_SPEC env: {}", spec_path);
+                config.spec_path = spec_path;
+            }
+            Ok(config)
         }
     }
 }
